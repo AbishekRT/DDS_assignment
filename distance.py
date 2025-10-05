@@ -1,13 +1,4 @@
-# ------------------------------------------------------------
 # Social Network Graph Analysis Console Application
-# Author: [Your Name]
-# Index: [Your Index Number]
-# Description:
-#   Models a social network as an undirected weighted graph.
-#   Supports adding/removing users and friendships, viewing
-#   network structure, finding shortest paths (Dijkstra),
-#   finding mutual friends, and suggesting new friends.
-# ------------------------------------------------------------
 
 import heapq
 
@@ -120,7 +111,7 @@ class SocialNetwork:
         self.graph[user2] = [(f, w) for f, w in self.graph[user2] if f != user1]
         print(f"Friendship between {user1} and {user2} removed.")
 
-# ------------------- MENU-DRIVEN INTERFACE -------------------
+# MENU-DRIVEN INTERFACE
 def main():
     sn = SocialNetwork()
     while True:

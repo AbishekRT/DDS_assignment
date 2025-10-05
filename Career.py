@@ -1,12 +1,4 @@
-# ==============================================
 # Career Guidance Binary Decision Tree
-# Author: [Your Name]
-# Index: [Your Index Number]
-# Description:
-#   This console-based program uses a binary decision tree
-#   to guide users toward suitable IT-related career paths
-#   through a series of yes/no questions.
-# ==============================================
 
 class Node:
     """Represents a single node in the decision tree (question or career)."""
@@ -16,9 +8,9 @@ class Node:
         self.left = None   # Yes branch
         self.right = None  # No branch
 
-# -----------------------------
+
 # Initialize base decision tree
-# -----------------------------
+
 def initialize_tree():
     root = Node("Do you enjoy solving logical problems?")
     root.left = Node("Do you prefer working with data over building interfaces?")
@@ -31,9 +23,9 @@ def initialize_tree():
     root.right.right.right = Node("IT Support Specialist", is_question=False)
     return root
 
-# --------------------------------
+
 # Function 1: Take the career quiz
-# --------------------------------
+
 def take_quiz(node):
     """Interactively traverse the tree based on yes/no answers."""
     if node is None:
@@ -49,9 +41,9 @@ def take_quiz(node):
             print("Please answer 'yes' or 'no'.")
     print(f"\n🎯 Recommended Career: {node.data}\n")
 
-# --------------------------------
+
 # Function 2: View all careers
-# --------------------------------
+
 def view_careers(node):
     """Display all possible career outcomes (leaf nodes)."""
     careers = []
@@ -67,9 +59,9 @@ def view_careers(node):
     for c in careers:
         print(f" - {c}")
 
-# --------------------------------
+
 # Function 3: Search by keyword
-# --------------------------------
+
 def search_tree(node, keyword):
     """Search the tree for a question or career containing the keyword."""
     found = []
@@ -87,9 +79,9 @@ def search_tree(node, keyword):
     else:
         print(f"'{keyword}' not found in the tree.")
 
-# --------------------------------
+
 # Helper: Find parent of target
-# --------------------------------
+
 def find_parent(node, parent, target):
     if node is None:
         return None, None
@@ -100,9 +92,9 @@ def find_parent(node, parent, target):
         return l
     return find_parent(node.right, node, target)
 
-# --------------------------------
+
 # Function 4: Add new question
-# --------------------------------
+
 def add_question(node):
     """Replace a career leaf with a new question and two new careers."""
     target = input("Enter the exact career to replace: ").strip()
@@ -120,11 +112,11 @@ def add_question(node):
         parent.left = new_node
     else:
         parent.right = new_node
-    print("✅ Question and new careers added successfully!")
+    print("Question and new careers added successfully!")
 
-# --------------------------------
+
 # Function 5: Remove a career
-# --------------------------------
+
 def remove_career(node):
     """Remove a career (leaf node) from the tree."""
     target = input("Enter the exact career to remove: ").strip()
@@ -138,9 +130,9 @@ def remove_career(node):
         parent.right = None
     print("🗑️ Career removed successfully!")
 
-# --------------------------------
+
 # Main Menu Loop
-# --------------------------------
+
 def main():
     tree = initialize_tree()
     while True:
