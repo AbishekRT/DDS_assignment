@@ -1,4 +1,5 @@
 import datetime
+import heapq
 
 # Patient class
 class Patient:
@@ -10,51 +11,48 @@ class Patient:
         self.status = "Waiting"
         self.time_registered = datetime.datetime.now()
 
-def __str__(self):
-    return self.patient_id + " " + self.name + " " + self.blood_type + " " + str(self.urgency) + " " + self.status
+    def __lt__(self, other):
+        # Priority by urgency, then by time registered
+        return (self.urgency, self.time_registered) < (other.urgency, other.time_registered)
 
+    def __str__(self):
+        return f"{self.patient_id:<6} {self.name:<10} {self.blood_type:<3} {self.urgency:<3} {self.status:<12}"
 
 # Global data structures
-patients = []
+patients_heap = []  # priority queue (min-heap)
 
-# Blood type compatibility
 compatibility = {
-    "O": ["O", "A", "B", "AB"],   # universal donor
+    "O": ["O", "A", "B", "AB"],
     "A": ["A", "AB"],
     "B": ["B", "AB"],
     "AB": ["AB"]
 }
 
 # Functions
-
 def register_patient():
     print("\n--- Register New Patient ---")
-    patient_id = input("Enter Patient ID: ").strip()
+    pid = input("Enter Patient ID: ").strip()
     name = input("Enter Name: ").strip()
-
-    # validate blood type
+    
     while True:
-        blood_type = input("Enter Blood Type (O, A, B, AB): ").strip().upper()
-        if blood_type in ["O", "A", "B", "AB"]:
+        bt = input("Enter Blood Type (O, A, B, AB): ").strip().upper()
+        if bt in ["O", "A", "B", "AB"]:
             break
-        else:
-            print("Invalid blood type. Try again.")
+        print("Invalid blood type.")
 
-    # validate urgency
     while True:
         try:
-            urgency = int(input("Enter Urgency Level (1=Critical to 5=Stable): "))
-            if 1 <= urgency <= 5:
+            urg = int(input("Enter Urgency Level (1=Critical to 5=Stable): "))
+            if 1 <= urg <= 5:
                 break
             else:
-                print("Urgency must be between 1 and 5.")
+                print("Urgency must be 1–5.")
         except ValueError:
             print("Please enter a number.")
 
-    patient = Patient(patient_id, name, blood_type, urgency)
-    patients.append(patient)
-    print("Patient " + name + " registered successfully!")
-
+    p = Patient(pid, name, bt, urg)
+    heapq.heappush(patients_heap, p)
+    print(f"Patient {name} added successfully!")
 
 def update_donor_availability():
     print("\n--- Donor Availability ---")
@@ -63,89 +61,61 @@ def update_donor_availability():
         print("Invalid blood type.")
         return
 
-    compatible_types = compatibility[donor_type]
-    compatible_patients = [p for p in patients if p.blood_type in compatible_types and p.status == "Waiting"]
+    compatible = compatibility[donor_type]
+    waiting = [p for p in patients_heap if p.blood_type in compatible and p.status == "Waiting"]
 
-    if not compatible_patients:
+    if not waiting:
         print("No compatible patients found.")
         return
 
-    # sort by urgency, then by time registered (FIFO if same urgency)
-    compatible_patients.sort(key=lambda p: (p.urgency, p.time_registered))
-
-    # pick the first one
-    selected = compatible_patients[0]
+    # find the highest priority patient (heap property ensures efficiency)
+    waiting.sort()  # ensures correct order if multiple compatible exist
+    selected = waiting[0]
     selected.status = "Matched"
     print(f"Patient {selected.name} (ID: {selected.patient_id}) matched for transplant!")
 
-
 def complete_transplant():
     print("\n--- Complete Transplant ---")
-    matched = [p for p in patients if p.status == "Matched"]
-
+    matched = [p for p in patients_heap if p.status == "Matched"]
     if not matched:
-        print("No patients currently matched.")
+        print("No matched patients.")
         return
-
-    patient = matched[0]  # only one can be matched at a time
+    patient = matched[0]
     patient.status = "Transplanted"
-    print(f"Patient {patient.name} (ID: {patient.patient_id}) marked as Transplanted.")
-
+    print(f"Patient {patient.name} successfully transplanted!")
 
 def view_waiting_list():
     print("\n--- Waiting List ---")
-    if not patients:
+    if not patients_heap:
         print("No patients registered.")
         return
-
     print(f"{'ID':<6} {'Name':<10} {'BT':<3} {'Urg':<3} {'Status':<12}")
     print("-" * 40)
-    for p in patients:
+    for p in sorted(patients_heap):
         print(p)
 
-
-def check_matching_status():
-    print("\n--- Matching Status ---")
-    matched = [p for p in patients if p.status == "Matched"]
-    if matched:
-        patient = matched[0]
-        print(f"Patient {patient.name} (ID: {patient.patient_id}) is currently matched and waiting for surgery.")
-    else:
-        print("No patients are currently matched. System is ready for next donor.")
-
-
-# Main menu
-# -------------------------------
 def main():
     while True:
-        print("\n====== Kidney Transplant Waiting List System ======")
+        print("\n===== Kidney Transplant Waiting List System =====")
         print("1. Register New Patient")
         print("2. Update Donor Availability")
-        print("3. Complete Transplant Procedure")
+        print("3. Complete Transplant")
         print("4. View Waiting List")
-        print("5. Check Matching Status")
-        print("6. Exit")
+        print("5. Exit")
 
-        choice = input("Enter your choice: ").strip()
-
-        if choice == "1":
+        c = input("Enter your choice: ").strip()
+        if c == "1":
             register_patient()
-        elif choice == "2":
+        elif c == "2":
             update_donor_availability()
-        elif choice == "3":
+        elif c == "3":
             complete_transplant()
-        elif choice == "4":
+        elif c == "4":
             view_waiting_list()
-        elif choice == "5":
-            check_matching_status()
-        elif choice == "6":
-            print("Exiting program. Goodbye!")
+        elif c == "5":
             break
         else:
-            print("Invalid choice. Try again.")
-
-
-# Run the program
+            print("Invalid choice.")
 
 if __name__ == "__main__":
     main()
